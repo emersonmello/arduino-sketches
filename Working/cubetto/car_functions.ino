@@ -67,12 +67,12 @@ void forward(int speed, int steps) {
   int counterL, counterR = 0;
 
   //right forward
-  digitalWrite(rightForward, speed);
-  analogWrite(rightReverse, LOW);
+  analogWrite(rightForward, speed);
+  digitalWrite(rightReverse, LOW);
 
   //left forward
-  digitalWrite(leftForward, speed);
-  analogWrite(leftReverse, LOW);
+  analogWrite(leftForward, speed);
+  digitalWrite(leftReverse, LOW);
 
 
   while (counterL <= steps && counterR <= steps) {
@@ -98,8 +98,8 @@ void left(int speed, int steps) {
   int counterL, counterR = 0;
 
   //right forward
-  digitalWrite(rightForward, speed);
-  analogWrite(rightReverse, LOW);
+  analogWrite(rightForward, speed);
+  digitalWrite(rightReverse, LOW);
 
   //left backward
   digitalWrite(leftForward, LOW);
