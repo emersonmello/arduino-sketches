@@ -70,7 +70,6 @@ void loop() {
 
     case FORWARD:
       initialize();
-      digitalWrite(11, HIGH);
       forward(128, 16);
       break;
 
