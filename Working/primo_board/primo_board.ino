@@ -30,6 +30,7 @@ int buttonPin = 50;
 int butVal, pButVal;
 
 boolean isExecuting = false;
+boolean wrongInstruction = false;
 
 int vals[16];
 
@@ -46,20 +47,69 @@ void setup() {
   
 }
 
-void loop() {
-  
-  //turn on LEDs if a block is inserted
-  for(int i = 0; i < 16; i++) {
-    int led = i+30;
-
-    //fix this
-    if (analogRead(i) < 1010) {
+void turnOnLED(int i, int led){
+  if (analogRead(i) < 1010) {
       digitalWrite(led, HIGH);
     } 
     else {
       digitalWrite(led, LOW);
+    }
+}
+
+boolean isAFunctionBlock(int pos){
+  int posValue = analogRead(pos); 
+  if ((posValue > (functionVal - gap)) && (posValue < (functionVal + gap))){
+    return true;
+  }
+  return false;
+}
+
+void loop() {
+  wrongInstruction = false;
+  //turn on LEDs if a block is inserted
+  for(int i = 0; i < 16; i++) {
+    int led = i+30;
+    turnOnLED(i, led); 
+    
+    
+  }
+  delay(100);
+
+  boolean previousFunctionBlock = false;
+  
+  // blink leds out of sequence
+  for(int i = 0; i < 16; i++) {
+    int led = i+30;
+    if ((i > 0) && (i < 12)){ // regular line
+      int lastLED = digitalRead(led-1);
+      if ((digitalRead(led) == HIGH) && (lastLED == LOW)){ 
+        digitalWrite(led, LOW);
+        
+      }
+    }else if (i>12){ // function area (green line)
+
+          int previousBlock = analogRead(i-1);       
+          int lastLED = digitalRead(led-1);
+
+          // a previous function block will not allow execution of next blocks
+          if (isAFunctionBlock(i-1)){
+              previousFunctionBlock = true;
+          }
+          // blink leds of current block if previous block is a function block or block is out of sequence
+          if (((digitalRead(led) == HIGH) && (lastLED == LOW)) || (previousFunctionBlock)){
+            digitalWrite(led, LOW);
+            wrongInstruction = true;
+          }
     }    
   }
+
+  // first position on function line should not be a function block because it will result in a infinite loop
+  if (isAFunctionBlock(12)){
+  int firstPosFunctionLine = analogRead(12); 
+    digitalWrite(12+30, LOW);
+    wrongInstruction = true;
+  }
+
 
   butVal = digitalRead(buttonPin);
   
@@ -69,16 +119,22 @@ void loop() {
   }
 
   if(isExecuting) {
-    readPins();
 
-    for ( int i = 0; i < 12; i++) {
-      if (vals[i] < 1010) {
-        route(i);
-      }
-      else {
-        break;
-      }
-    }    
+    if (wrongInstruction){
+      // TODO: shake cubetto to say: no no no no
+      
+    }else{
+      readPins();
+
+      for ( int i = 0; i < 12; i++) {
+        if (vals[i] < 1010) {
+          route(i);
+        }
+        else {
+          break;
+        }
+      }    
+    }
   }  
   
   isExecuting = false;
