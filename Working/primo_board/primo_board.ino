@@ -14,14 +14,15 @@ ANALOG VALUES FOR DIFFERENT RESISTORS:
 220Ω = 20
 */
 
-//4.7kΩ
+//4.7kΩ RED Block
 int forwardVal = 326;
-//10kΩ
-int leftVal = 511;
-//220Ω
+//220Ω Yellow Block
 int rightVal = 22;
-//100kΩ
-int functionVal = 931;
+//10kΩ Green Block
+int functionVal = 511;
+//100kΩ Blue Block
+int leftVal = 931;
+
 //range 
 int gap = 50;
 
@@ -34,21 +35,22 @@ int vals[16];
 
 void setup() {  
   //led init
-  for (int i = 22; i < 38; i++) {
+  for (int i = 30; i < 47; i++) {
     pinMode(i, OUTPUT);
   }
 
   pinMode(buttonPin, INPUT);
-
   Serial.begin(9600);
-  Serial1.begin(9600);
+  pinMode(13, OUTPUT);
+  digitalWrite(13,LOW);
+  
 }
 
 void loop() {
   
   //turn on LEDs if a block is inserted
   for(int i = 0; i < 16; i++) {
-    int led = i+22;
+    int led = i+30;
 
     //fix this
     if (analogRead(i) < 1010) {
@@ -69,7 +71,7 @@ void loop() {
   if(isExecuting) {
     readPins();
 
-    for ( int i = 0; i < 12; i++) {
+    for ( int i = 0; i < 17; i++) {
       if (vals[i] < 1010) {
         route(i);
       }
@@ -82,12 +84,5 @@ void loop() {
   isExecuting = false;
   pButVal = butVal;
 
-  //Serial.println(analogRead(0));
   delay(30);
 }
-
-
-
-
-
-
