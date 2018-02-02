@@ -71,7 +71,7 @@ void loop() {
   if(isExecuting) {
     readPins();
 
-    for ( int i = 0; i < 17; i++) {
+    for ( int i = 0; i < 12; i++) {
       if (vals[i] < 1010) {
         route(i);
       }
