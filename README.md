@@ -1,8 +1,8 @@
-#Primo Prototype Arduino Sketches
+# Primo Prototype Arduino Sketches
 
 Arduino sketches for the prototype
 
-##How it's organized
+## How it's organized
 
 The **Working** folder is where you can find the latest working sketches, both for Cubetto and the Interface Board.
 
