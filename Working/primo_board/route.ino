@@ -33,10 +33,8 @@ void route(int i) {
     //route function line
     for ( int j = 12; j < 16; j++) {
       if (vals[j] < 1023) {
-        //INFINITE LOOP FOR THE WIN!!
-        route(j);
-      }
-      else {
+          route(j);
+      }else {
         break;
       }
     }
