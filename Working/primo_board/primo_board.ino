@@ -146,7 +146,7 @@ void loop() {
   for (int i = 0; i < 16; i++) {
     int led = i + 30;
     // blink the current led if there is no previous block inserted
-    if ((i > 0) && (i < 16)) { // regular line
+    if (i > 0) { // regular line
       if ((vals[i] < emptyEdge ) && (vals[i - 1] >= emptyEdge)) {
         if ((i != 12) || ((i==12) && (!thereIsFunctionBlock))){
           digitalWrite(led, LOW);
@@ -154,9 +154,13 @@ void loop() {
         }
       }
     }
-
-    if (i > 11) { // function area (green line)
-      if ((isAFunctionBlock(i)) || (!thereIsFunctionBlock)) {
+    
+    // function area (green line)
+    if (i > 11){
+      if (isAFunctionBlock(i)){ 
+        digitalWrite(led, LOW);
+        wrongInstruction = true;
+      }else if ((!thereIsFunctionBlock) && (whichBlock(vals[i]) != 'U')){
         digitalWrite(led, LOW);
         wrongInstruction = true;
       }
