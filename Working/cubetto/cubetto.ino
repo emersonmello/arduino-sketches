@@ -16,25 +16,33 @@ Load this into Cubetto, the little cube robot.
 #define LEFT 'L'
 #define RIGHT 'R'
 #define FORWARD 'F'
+#define BACKWARD 'B'
 #define INIT 'I'
+#define WRONG 'W'
 
-//left motor
-const int leftEnable = 13;
-const int leftForward = 10;
-const int leftReverse = 11;
+//left motor - M2
+const int leftEnable = 5;
+const int leftForward = 6;
+const int leftReverse = 7;
 
-//right motor
-const int rightEnable = 12;
-const int rightForward = 6;
-const int rightReverse = 9;
+//right motor - M1
+const int rightEnable = 2;
+const int rightForward = 3;
+const int rightReverse = 4;
 
 //encoders
-const int leftEncoder = A1;
-const int rightEncoder = A4;
+const int leftEncoder = A0;
+const int rightEncoder = A1;
+
+//CNY70
+const int bwVal = 150;
 
 char instruction = 'O';
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+  
 
   Serial.begin(9600);
 
@@ -52,10 +60,11 @@ void setup() {
   digitalWrite(leftEnable, HIGH);
   digitalWrite(rightEnable, HIGH);
 
+  delay(1000);
   //initialize aligns the wheels
   initialize();
-
-  delay(2000);
+  delay(500);
+ 
 }
 
 void loop() {
@@ -68,26 +77,37 @@ void loop() {
   //decode instruction
   switch (instruction) {    
 
+    case 'T':
+    case 't':
+      initialize();
+      turningTest(50,2);
+      break;
+
     case FORWARD:
+    case 'f':
       initialize();
       forward(128, 16);
       break;
 
     case LEFT:
+    case 'l':
       initialize();
-      left(128, 9);
+      left(135, 7);
       break;
 
     case RIGHT:
+    case 'r':
       initialize();
-      right(138, 7);
+      right(135, 7);
       break;
 
     case INIT:
+    case 'i':
       initialize();
       break;
   
     case STOP:
+    case 's':
       stop();
       break;
 
@@ -95,6 +115,9 @@ void loop() {
       stop();
       break;
   }
+  instruction = 'O';
+  
+  delay(100);
 }
 
 
