@@ -14,6 +14,19 @@
   220Ω = 20
 */
 
+#include "pitches.h"
+
+// notes in the melody:
+int melody[] = {
+  NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3, NOTE_C4
+};
+
+// note durations: 4 = quarter note, 8 = eighth note, etc.:
+int noteDurations[] = {
+  4, 8, 8, 4, 4, 4, 4, 4
+};
+
+
 //4.7kΩ RED Block
 const int forwardVal = 326;
 //220Ω Yellow Block
@@ -35,10 +48,16 @@ int butVal, pButVal;
 boolean isExecuting = false;
 boolean wrongInstruction = false;
 boolean thereIsFunctionBlock = false;
+boolean thereIsNoBlock = true;
 
 int limit = 12;
 
 int vals[16];
+
+// piezo 
+const int audioPin =8;
+const int NOTE_SUSTAIN = 100;
+
 
 void setup() {
   //led init
@@ -48,14 +67,42 @@ void setup() {
 
   pinMode(buttonPin, INPUT);
   Serial.begin(9600);
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
+  
+  //startup sound
+  playMelody();
+}
 
+// took from Arduino Samples
+void playMelody(){
+   for (int thisNote = 0; thisNote < 8; thisNote++) {
+
+    // to calculate the note duration, take one second divided by the note type.
+    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+    int noteDuration = 1000 / noteDurations[thisNote];
+    tone(13, melody[thisNote], noteDuration);
+
+    // to distinguish the notes, set a minimum time between them.
+    // the note's duration + 30% seems to work well:
+    int pauseBetweenNotes = noteDuration * 1.30;
+    delay(pauseBetweenNotes);
+    // stop the tone playing:
+    noTone(13);
+  }
+}
+
+void sayNoNoNo(){
+   tone(13,NOTE_G4);
+   delay(250);
+   tone(13,NOTE_C4);
+   delay(500);
+   noTone(13);
+    delay(100);
 }
 
 /* blink all leds to say: wrong sequence, man!*/
 void wrongFeedback() {
   Serial.write('W'); // sending Wrong message to cubetto
+  sayNoNoNo();
   int led = 30;
   for (int i = 0; i < 16; i++) {
     digitalWrite(i + led, LOW);
@@ -81,6 +128,7 @@ void wrongFeedback() {
 void turnOnLED(int i, int led) {
   if (vals[i] < emptyEdge) {
     digitalWrite(led, HIGH);
+    thereIsNoBlock = false;
   }
   else {
     digitalWrite(led, LOW);
@@ -124,6 +172,7 @@ char whichBlock(int value) {
 
 void loop() {
 
+  thereIsNoBlock = true;
   thereIsFunctionBlock = false;
   wrongInstruction = false;
 
@@ -177,8 +226,7 @@ void loop() {
 
   if (isExecuting) {
 
-    if (wrongInstruction) {
-      // TODO: shake cubetto to say: no no no no
+    if ((wrongInstruction) || (thereIsNoBlock)) {
       wrongFeedback();
     } else {
       readPins();

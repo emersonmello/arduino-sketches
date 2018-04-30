@@ -10,14 +10,14 @@ void route(int i) {
     case 'L':
       Serial.println('L');
       digitalWrite(led, LOW);
-      delay(1000);
+      delay(1500);
       break;
     case 'R':
       Serial.println('R');
       digitalWrite(led, LOW);
-      delay(1000);
+      delay(1500);
       break;
-    case 'P':
+    case 'P': // function
       digitalWrite(led, LOW);
       //route function line
       for ( int j = 12; j < 16; j++) {
@@ -26,7 +26,6 @@ void route(int i) {
           case 'L':
           case 'R':
             route(j);
-            break;
         }
       }
       //turn function leds back on
@@ -35,7 +34,7 @@ void route(int i) {
           digitalWrite(j + 30, HIGH);
         }
       }
-      delay(500);
+      delay(1000);
       break;
   }
 }
