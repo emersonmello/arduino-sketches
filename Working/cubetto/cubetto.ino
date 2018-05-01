@@ -63,7 +63,6 @@ void setup() {
   delay(1000);
   //initialize aligns the wheels
   initialize();
-  delay(500);
  
 }
 
@@ -79,26 +78,26 @@ void loop() {
 
     case 'T':
     case 't':
-      initialize();
-      turningTest(50,2);
+//      initialize();
+//      turningTest(50,2);
       break;
+    case BACKWARD:
+    case 'b':
+      backward(128,16);   
 
     case FORWARD:
     case 'f':
-      initialize();
       forward(128, 16);
       break;
 
     case LEFT:
     case 'l':
-      initialize();
-      left(135, 7);
+       left(150, 5);
       break;
 
     case RIGHT:
     case 'r':
-      initialize();
-      right(135, 7);
+      right(130, 7);
       break;
 
     case INIT:
@@ -116,8 +115,6 @@ void loop() {
       break;
   }
   instruction = 'O';
-  
-  delay(100);
 }
 
 
