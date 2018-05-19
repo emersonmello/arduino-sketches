@@ -1,3 +1,5 @@
+#include <PString.h>
+
 //one wheel is composed of 32 slices
 //16 black and 16 white.
 
@@ -10,10 +12,8 @@ int readEncoder(int enc) {
 }
 
 
-//rotate wheels until the next sign
+//rotate wheels until the next black sign
 void initialize() {
-  //  int vl = readEncoder(leftEncoder);
-
   //forward left
   analogWrite(leftForward, 88);
   digitalWrite(leftReverse, LOW);
@@ -21,10 +21,6 @@ void initialize() {
   while (readEncoder(leftEncoder) == blackSlice);
 
   stopLeft();
-
-  delay(100);
-
-  int vr = readEncoder(rightEncoder);
 
   //forward right
   analogWrite(rightForward, 88);
@@ -37,55 +33,6 @@ void initialize() {
 
 /* MOTION FUNCTIONS */
 
-//not used
-void backward(int speed, int steps) {
-  int vL, pvL = -1;
-  int vR, pvR = -1;
-
-  int counterL, counterR = 0;
-
-  pvL = readEncoder(leftEncoder);
-  pvR = readEncoder(rightEncoder);
-
-  //right backward
-  digitalWrite(rightForward, LOW);
-  analogWrite(rightReverse, speed);
-
-  //left backward
-  digitalWrite(leftForward, LOW);
-  analogWrite(leftReverse, speed);
-
-
-  while (counterL <= steps || counterR <= steps) {
-    if (counterL <= steps) {
-      vL = readEncoder(leftEncoder);
-      if (vL != pvL) {
-        counterL++;
-        pvL = vL;
-      }
-
-    }
-    if (counterR <= steps) {
-      vR = readEncoder(rightEncoder);
-      if (vR != pvR) {
-        counterR++;
-        pvR = vR;
-      }
-    }
-    // debug
-    Serial.print("R L: ");
-    Serial.println(counterL);
-    Serial.println(vL);
-    Serial.print("R R: ");
-    Serial.println(counterR);
-    Serial.println(vR);
-  }
-
-
-
-  stop();
-}
-
 // Red block
 void forward(int speed, int steps) {
   int vL, pvL = -1;
@@ -96,15 +43,18 @@ void forward(int speed, int steps) {
   pvL = readEncoder(leftEncoder);
   pvR = readEncoder(rightEncoder);
 
-  //right forward
-  analogWrite(rightForward, speed);
-  digitalWrite(rightReverse, LOW);
-
   //left forward
   analogWrite(leftForward, speed);
   digitalWrite(leftReverse, LOW);
 
-
+  //TODO Fix me
+  // trying to handle: right motor is faster than left
+  delay(100);
+  
+   //right forward
+  analogWrite(rightForward, speed);
+  digitalWrite(rightReverse, LOW);
+  
   while (counterL <= steps || counterR <= steps) {
     if (counterL <= steps) {
       vL = readEncoder(leftEncoder);
@@ -120,12 +70,6 @@ void forward(int speed, int steps) {
         pvR = vR;
       }
     }
-    Serial.print("F L: ");
-    Serial.println(counterL);
-    Serial.println(vL);
-    Serial.print("F R: ");
-    Serial.println(counterR);
-    Serial.println(vR);
   }
 
   stop();
@@ -134,57 +78,34 @@ void forward(int speed, int steps) {
 // Blue block
 void left(int speed, int steps) {
   int vL, pvL = -1;
-  int vR, pvR = -1;
-
   int counterL, counterR = 0;
 
   pvL = readEncoder(leftEncoder);
-  pvR = readEncoder(rightEncoder);
-
-  //right forward
-  analogWrite(rightForward, speed);
-  digitalWrite(rightReverse, LOW);
 
   //left backward
   digitalWrite(leftForward, LOW);
   analogWrite(leftReverse, speed);
 
-  //count rotation
-  while (counterL <= steps) { //&& counterR <= steps) {
-    if (counterL <= steps) {
-      vL = readEncoder(leftEncoder);
-      if (vL != pvL) {
-        counterL++;
-        pvL = vL;
-      }
-    }
-    if (counterR <= steps) {
-      vR = readEncoder(rightEncoder);
-      if (vR != pvR) {
-        counterR++;
-        pvR = vR;
-      }
-    }
-    //debug
-    Serial.print("L L: ");
-    Serial.println(counterL);
-    Serial.println(vL);
-    Serial.print("L R: ");
-    Serial.println(counterR);
-    Serial.println(vR);
-  }
+  //right forward
+  analogWrite(rightForward, speed);
+  digitalWrite(rightReverse, LOW);
 
+  //count rotation
+  while (counterL <= steps) {
+    vL = readEncoder(leftEncoder);
+    if (vL != pvL) {
+      counterL++;
+      pvL = vL;
+    }
+  }
   stop();
 }
 
 // Yellow block
 void right(int speed, int steps) {
-  int vL, pvL = -1;
   int vR, pvR = -1;
-
-  int counterL = 0, counterR = 0;
-
-  pvL = readEncoder(leftEncoder);
+  int counterR = 0;
+  
   pvR = readEncoder(rightEncoder);
 
   //right reverse
@@ -196,31 +117,13 @@ void right(int speed, int steps) {
   analogWrite(leftForward, speed);
 
   //count rotation
-  while (counterR <= steps) { // && counterL <= steps) {
-    if (counterR <= steps) {
-      vR = readEncoder(rightEncoder);
-      if (vR != pvR) {
-        counterR++;
-        pvR = vR;
-      }
+  while (counterR <= steps) {
+    vR = readEncoder(rightEncoder);
+    if (vR != pvR) {
+      counterR++;
+      pvR = vR;
     }
-    if (counterL <= steps) {
-      vL = readEncoder(leftEncoder);
-      if (vL != pvL) {
-        counterL++;
-        pvL = vL;
-      }
-    }
-    //debug
-    Serial.print("R L: ");
-    Serial.println(counterL);
-    Serial.println(vL);
-    Serial.print("R R: ");
-    Serial.println(counterR);
-    Serial.println(vR);
-
   }
-
   stop();
 }
 
@@ -236,19 +139,13 @@ void stopRight() {
 }
 
 void stop() {
-  digitalWrite(leftEnable, LOW);
-  digitalWrite(rightEnable, LOW);
   stopLeft();
   stopRight();
-  digitalWrite(leftEnable, HIGH);
-  digitalWrite(rightEnable, HIGH);
 }
 
 void hardStop() {
   digitalWrite(leftForward, HIGH);
   digitalWrite(leftReverse, HIGH);
-
   digitalWrite(rightForward, HIGH);
   digitalWrite(rightReverse, HIGH);
-  instruction = 'O';
 }
