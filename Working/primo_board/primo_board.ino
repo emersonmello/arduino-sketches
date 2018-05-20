@@ -58,10 +58,16 @@ int vals[16];
 const int audioPin =8;
 const int NOTE_SUSTAIN = 100;
 
+const int firstLedPin = 30;
+const int lastLedPin = 46;
+
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  
   //led init
-  for (int i = 30; i < 47; i++) {
+  for (int i = firstLedPin; i <= lastLedPin; i++) {
     pinMode(i, OUTPUT);
   }
 
@@ -79,31 +85,30 @@ void playMelody(){
     // to calculate the note duration, take one second divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
     int noteDuration = 1000 / noteDurations[thisNote];
-    tone(13, melody[thisNote], noteDuration);
+    tone(audioPin, melody[thisNote], noteDuration);
 
     // to distinguish the notes, set a minimum time between them.
     // the note's duration + 30% seems to work well:
     int pauseBetweenNotes = noteDuration * 1.30;
     delay(pauseBetweenNotes);
     // stop the tone playing:
-    noTone(13);
+    noTone(audioPin);
   }
 }
 
 void sayNoNoNo(){
-   tone(13,NOTE_G4);
+   tone(audioPin,NOTE_G4);
    delay(250);
-   tone(13,NOTE_C4);
+   tone(audioPin,NOTE_C4);
    delay(500);
-   noTone(13);
-    delay(100);
+   noTone(audioPin);
+   delay(100);
 }
 
 /* blink all leds to say: wrong sequence, man!*/
 void wrongFeedback() {
-  Serial.write('W'); // sending Wrong message to cubetto
   sayNoNoNo();
-  int led = 30;
+  int led = firstLedPin;
   for (int i = 0; i < 16; i++) {
     digitalWrite(i + led, LOW);
   }
@@ -180,7 +185,7 @@ void loop() {
 
   //turn on LEDs if a block is inserted
   for (int i = 0; i < 16; i++) {
-    int led = i + 30;
+    int led = i + firstLedPin;
     turnOnLED(i, led);
     if (i < 12) { // regular line
       if (isAFunctionBlock(i)) {
@@ -193,7 +198,7 @@ void loop() {
 
   // blink leds out of sequence
   for (int i = 0; i < 16; i++) {
-    int led = i + 30;
+    int led = i + firstLedPin;
     // blink the current led if there is no previous block inserted
     if (i > 0) { // regular line
       if ((vals[i] < emptyEdge ) && (vals[i - 1] >= emptyEdge)) {
@@ -232,7 +237,7 @@ void loop() {
       readPins();
       for ( int i = 0; i < 12; i++) {
         if (vals[i] < emptyEdge) {
-          route(i);
+          route(i,-1);
         }
         else {
           break;
